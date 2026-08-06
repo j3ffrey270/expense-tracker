@@ -1,0 +1,28 @@
+<div class="toast-overlay-container">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast-card"
+    [ngClass]="getToastClass(toast.type)"
+  >
+    <div class="toast-accent-bar"></div>
+
+    <div class="toast-icon-wrapper">
+      <ion-icon [name]="getIconName(toast.type)" class="toast-status-icon"></ion-icon>
+    </div>
+
+    <div class="toast-content-body">
+      <div class="toast-title">{{ toast.title }}</div>
+      <div *ngIf="toast.message" class="toast-message">{{ toast.message }}</div>
+    </div>
+
+    <div *ngIf="toast.actionText" class="toast-action-wrapper">
+      <button type="button" class="toast-action-btn" (click)="handleAction(toast)">
+        {{ toast.actionText }}
+      </button>
+    </div>
+
+    <button type="button" class="toast-close-btn" (click)="dismiss(toast.id)">
+      <ion-icon name="close-outline"></ion-icon>
+    </button>
+  </div>
+</div>

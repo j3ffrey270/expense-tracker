@@ -1,0 +1,152 @@
+.toast-overlay-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999;
+  width: 90%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast-card {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04);
+  overflow: hidden;
+  animation: toastSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .toast-accent-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+  }
+
+  .toast-icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    margin-left: 2px;
+  }
+
+  .toast-content-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .toast-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #0f172a;
+    line-height: 1.3;
+  }
+
+  .toast-message {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  .toast-action-wrapper {
+    margin-left: 4px;
+  }
+
+  .toast-action-btn {
+    background: #4f46e5;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #4338ca;
+    }
+  }
+
+  .toast-close-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #334155;
+    }
+  }
+
+  &.success {
+    .toast-accent-bar {
+      background: #22c55e;
+    }
+
+    .toast-status-icon {
+      color: #22c55e;
+    }
+  }
+
+  &.error {
+    .toast-accent-bar {
+      background: #ef4444;
+    }
+
+    .toast-status-icon {
+      color: #ef4444;
+    }
+  }
+
+  &.warning {
+    .toast-accent-bar {
+      background: #f59e0b;
+    }
+
+    .toast-status-icon {
+      color: #f59e0b;
+    }
+  }
+
+  &.info {
+    .toast-accent-bar {
+      background: #3b82f6;
+    }
+
+    .toast-status-icon {
+      color: #3b82f6;
+    }
+  }
+}
+
+@keyframes toastSlideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

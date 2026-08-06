@@ -1,20 +1,32 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar color="primary">
     <ion-title>
-      Blank
+      Expense Tracker Dashboard
     </ion-title>
+    <ion-button slot="end" fill="clear" color="light" (click)="onLogout()">
+      <ion-icon name="log-out-outline" slot="start"></ion-icon>
+      Logout
+    </ion-button>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="home-container">
+    <ion-card class="user-card">
+      <ion-card-header>
+        <div class="user-avatar">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </div>
+        <ion-card-title>Welcome, {{ currentUser?.name || 'User' }}!</ion-card-title>
+        <ion-card-subtitle>{{ currentUser?.email || 'Logged in session' }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p>Authentication and route security active! You are currently logged in.</p>
+        <ion-button expand="block" color="danger" class="ion-margin-top" (click)="onLogout()">
+          <ion-icon name="log-out-outline" slot="start"></ion-icon>
+          Sign Out & Test Login Security
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
   </div>
 </ion-content>
