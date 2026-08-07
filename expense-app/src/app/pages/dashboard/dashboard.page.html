@@ -1,233 +1,146 @@
-<ion-content class="dashboard-content-host">
-  <div class="dashboard-app-layout">
-    
-    <aside class="sidebar-navigation">
-      <div class="sidebar-brand">
-        <div class="brand-logo-icon">
-          <ion-icon name="wallet-outline"></ion-icon>
-        </div>
-        <span class="brand-title-text">ExpenseTracker</span>
+<div class="dashboard-scrollable-content">
+  <div class="overview-cards-grid">
+    <div class="stat-card balance-card">
+      <div class="stat-card-icon-badge blue-badge">
+        <ion-icon name="wallet-outline"></ion-icon>
       </div>
-
-      <nav class="sidebar-menu-list">
-        <button
-          type="button"
-          class="nav-item-btn active"
-          (click)="setActiveNav('dashboard')"
-        >
-          <ion-icon name="grid-outline"></ion-icon>
-          <span>Dashboard</span>
-        </button>
-      </nav>
-
-      <div class="sidebar-footer">
-        <button type="button" class="nav-item-btn logout-btn" (click)="onLogout()">
-          <ion-icon name="log-out-outline"></ion-icon>
-          <span>Logout</span>
-        </button>
+      <div class="stat-card-details">
+        <span class="stat-label-title">Total Balance</span>
+        <h2 class="stat-amount-value">{{ totalBalance | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <span class="stat-trend-badge positive">
+          <ion-icon name="trending-up-outline"></ion-icon> +12.3% from last month
+        </span>
       </div>
-    </aside>
+    </div>
 
-    <main class="main-dashboard-body">
-
-      <header class="top-header-navbar">
-        <div class="header-left-title">
-          <h1 class="page-main-heading">Dashboard</h1>
-          <p class="greeting-subtitle">
-            Welcome back, <strong>{{ currentUser?.name || 'John' }}</strong>! 👋
-          </p>
-        </div>
-
-        <div class="header-right-controls">
-          <div class="search-input-wrapper">
-            <ion-icon name="search-outline" class="search-icon"></ion-icon>
-            <input
-              type="text"
-              class="header-search-input"
-              placeholder="Search something..."
-              [(ngModel)]="searchQuery"
-              (input)="onSearchChange()"
-            />
-          </div>
-
-          <button type="button" class="icon-circle-btn" aria-label="Notifications">
-            <ion-icon name="notifications-outline"></ion-icon>
-          </button>
-
-          <button type="button" class="icon-circle-btn" aria-label="Calendar">
-            <ion-icon name="calendar-outline"></ion-icon>
-          </button>
-
-          <div class="user-profile-dropdown">
-            <div class="profile-avatar-circle">
-              <span>{{ (currentUser?.name || 'J')[0] }}</span>
-            </div>
-            <span class="user-display-name">{{ currentUser?.name || 'John Doe' }}</span>
-            <ion-icon name="chevron-down-outline" class="dropdown-chevron"></ion-icon>
-          </div>
-        </div>
-      </header>
-
-      <div class="dashboard-scrollable-content">
-        
-        <div class="overview-cards-grid">
-          
-          <div class="stat-card balance-card">
-            <div class="stat-card-icon-badge blue-badge">
-              <ion-icon name="wallet-outline"></ion-icon>
-            </div>
-            <div class="stat-card-details">
-              <span class="stat-label-title">Total Balance</span>
-              <h2 class="stat-amount-value">{{ totalBalance | currency:'USD':'symbol':'1.2-2' }}</h2>
-              <span class="stat-trend-badge positive">
-                <ion-icon name="trending-up-outline"></ion-icon> +12.3% from last month
-              </span>
-            </div>
-          </div>
-
-          <div class="stat-card income-card">
-            <div class="stat-card-icon-badge green-badge">
-              <ion-icon name="cash-outline"></ion-icon>
-            </div>
-            <div class="stat-card-details">
-              <span class="stat-label-title">Total Income</span>
-              <h2 class="stat-amount-value">{{ totalIncome | currency:'USD':'symbol':'1.2-2' }}</h2>
-              <span class="stat-trend-badge positive">
-                <ion-icon name="trending-up-outline"></ion-icon> +8.2% from last month
-              </span>
-            </div>
-          </div>
-
-          <div class="stat-card expense-card">
-            <div class="stat-card-icon-badge red-badge">
-              <ion-icon name="trending-down-outline"></ion-icon>
-            </div>
-            <div class="stat-card-details">
-              <span class="stat-label-title">Total Expense</span>
-              <h2 class="stat-amount-value">{{ totalExpense | currency:'USD':'symbol':'1.2-2' }}</h2>
-              <span class="stat-trend-badge negative">
-                <ion-icon name="trending-down-outline"></ion-icon> -4.3% from last month
-              </span>
-            </div>
-          </div>
-
-          <div class="stat-card month-card">
-            <div class="stat-card-icon-badge purple-badge">
-              <ion-icon name="calendar-outline"></ion-icon>
-            </div>
-            <div class="stat-card-details">
-              <span class="stat-label-title">This Month</span>
-              <h2 class="stat-amount-value">{{ thisMonthTotal | currency:'USD':'symbol':'1.2-2' }}</h2>
-              <span class="stat-trend-badge positive">
-                <ion-icon name="trending-up-outline"></ion-icon> +3.8% from last month
-              </span>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="analytics-charts-grid">
-          
-          <div class="dashboard-chart-card line-chart-wrapper">
-            <div class="chart-card-header">
-              <h3 class="chart-card-title">Income vs Expenses</h3>
-              <select class="chart-year-filter">
-                <option value="this-year">This Year</option>
-                <option value="last-year">Last Year</option>
-              </select>
-            </div>
-            <div class="chart-canvas-container">
-              <canvas #lineCanvas></canvas>
-            </div>
-          </div>
-
-          <div class="dashboard-chart-card doughnut-chart-wrapper">
-            <div class="chart-card-header">
-              <h3 class="chart-card-title">Expense by Category</h3>
-            </div>
-            <div class="doughnut-content-body">
-              <div class="doughnut-canvas-box">
-                <canvas #doughnutCanvas></canvas>
-              </div>
-              <div class="category-legend-list">
-                <div
-                  *ngFor="let item of categoryBreakdown"
-                  class="legend-item-row"
-                >
-                  <div class="legend-dot-label">
-                    <span class="legend-color-dot" [style.background-color]="item.category.color"></span>
-                    <span class="legend-category-name">{{ item.category.name }}</span>
-                  </div>
-                  <div class="legend-amount-percentage">
-                    <span class="legend-amount">{{ item.amount | currency:'USD':'symbol':'1.0-0' }}</span>
-                    <span class="legend-pct">({{ item.percentage }}%)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <div class="bottom-tables-grid">
-          
-          <div class="dashboard-card transactions-table-card">
-            <div class="chart-card-header">
-              <h3 class="chart-card-title">Recent Transactions</h3>
-            </div>
-
-            <div class="transactions-list-box">
-              <div
-                *ngFor="let tx of filteredTransactions.slice(0, 6)"
-                class="transaction-row-item"
-              >
-                <div
-                  class="tx-icon-badge"
-                  [style.background-color]="tx.categoryColor + '20'"
-                  [style.color]="tx.categoryColor"
-                >
-                  <ion-icon [name]="tx.categoryIcon || 'card-outline'"></ion-icon>
-                </div>
-
-                <div class="tx-item-info">
-                  <span class="tx-item-title">{{ tx.title }}</span>
-                  <span class="tx-item-category">{{ tx.categoryName }}</span>
-                </div>
-
-                <div class="tx-item-amount-action">
-                  <span
-                    class="tx-amount-value"
-                    [class.income-tx]="tx.type === 'income'"
-                    [class.expense-tx]="tx.type === 'expense'"
-                  >
-                    {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'USD':'symbol':'1.2-2' }}
-                  </span>
-                </div>
-              </div>
-
-              <div *ngIf="filteredTransactions.length === 0" class="empty-state-box">
-                <p>No transactions found.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="dashboard-card monthly-bar-card">
-            <div class="chart-card-header">
-              <h3 class="chart-card-title">Monthly Summary</h3>
-              <select class="chart-year-filter">
-                <option value="this-year">This Year</option>
-              </select>
-            </div>
-            <div class="chart-canvas-container">
-              <canvas #barCanvas></canvas>
-            </div>
-          </div>
-
-        </div>
-
+    <div class="stat-card income-card">
+      <div class="stat-card-icon-badge green-badge">
+        <ion-icon name="arrow-down-circle-outline"></ion-icon>
       </div>
+      <div class="stat-card-details">
+        <span class="stat-label-title">Total Income</span>
+        <h2 class="stat-amount-value">{{ totalIncome | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <span class="stat-trend-badge positive">
+          <ion-icon name="trending-up-outline"></ion-icon> +8.1% from last month
+        </span>
+      </div>
+    </div>
 
-    </main>
+    <div class="stat-card expense-card">
+      <div class="stat-card-icon-badge red-badge">
+        <ion-icon name="arrow-up-circle-outline"></ion-icon>
+      </div>
+      <div class="stat-card-details">
+        <span class="stat-label-title">Total Expense</span>
+        <h2 class="stat-amount-value">{{ totalExpense | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <span class="stat-trend-badge negative">
+          <ion-icon name="trending-down-outline"></ion-icon> -4.3% from last month
+        </span>
+      </div>
+    </div>
 
+    <div class="stat-card month-card">
+      <div class="stat-card-icon-badge purple-badge">
+        <ion-icon name="calendar-outline"></ion-icon>
+      </div>
+      <div class="stat-card-details">
+        <span class="stat-label-title">This Month</span>
+        <h2 class="stat-amount-value">{{ thisMonthTotal | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <span class="stat-trend-badge positive">
+          <ion-icon name="trending-up-outline"></ion-icon> +3.8% from last month
+        </span>
+      </div>
+    </div>
   </div>
-</ion-content>
+
+  <div class="analytics-charts-grid">
+    <div class="dashboard-chart-card line-chart-wrapper">
+      <div class="chart-card-header">
+        <h3 class="chart-card-title">Income vs Expenses</h3>
+        <select class="chart-year-filter">
+          <option value="2026">This Year</option>
+        </select>
+      </div>
+      <div class="chart-canvas-container">
+        <canvas #lineCanvas></canvas>
+      </div>
+    </div>
+
+    <div class="dashboard-chart-card doughnut-chart-wrapper">
+      <div class="chart-card-header">
+        <h3 class="chart-card-title">Expense by Category</h3>
+      </div>
+      <div class="doughnut-content-body">
+        <div class="doughnut-canvas-box">
+          <canvas #doughnutCanvas></canvas>
+        </div>
+        <div class="category-legend-list">
+          <div *ngFor="let item of categoryBreakdown" class="legend-item-row">
+            <div class="legend-dot-label">
+              <span class="legend-color-dot" [style.background-color]="item.category.color"></span>
+              <span class="legend-category-name">{{ item.category.name }}</span>
+            </div>
+            <div class="legend-amount-percentage">
+              <span class="legend-amount">{{ item.amount | currency:'INR':'symbol':'1.0-0' }}</span>
+              <span class="legend-pct">({{ item.percentage }}%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-tables-grid">
+    <div class="dashboard-card transactions-table-card">
+      <div class="chart-card-header">
+        <h3 class="chart-card-title">Recent Transactions</h3>
+        <button type="button" class="view-all-link-btn" [routerLink]="['/transactions']">
+          View All
+        </button>
+      </div>
+
+      <div class="transactions-list-box">
+        <div *ngFor="let tx of filteredTransactions.slice(0, 6)" class="transaction-row-item">
+          <div
+            class="tx-icon-badge"
+            [style.background-color]="tx.categoryColor + '20'"
+            [style.color]="tx.categoryColor"
+          >
+            <ion-icon [name]="tx.categoryIcon"></ion-icon>
+          </div>
+
+          <div class="tx-item-info">
+            <span class="tx-item-title">{{ tx.title }}</span>
+            <span class="tx-item-category">{{ tx.categoryName }}</span>
+          </div>
+
+          <div class="tx-item-amount-action">
+            <span
+              class="tx-amount-value"
+              [class.income-tx]="tx.type === 'income'"
+              [class.expense-tx]="tx.type === 'expense'"
+            >
+              {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'INR':'symbol':'1.2-2' }}
+            </span>
+          </div>
+        </div>
+
+        <div *ngIf="filteredTransactions.length === 0" class="empty-state-box">
+          <p>No recent transactions found.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-card monthly-bar-card">
+      <div class="chart-card-header">
+        <h3 class="chart-card-title">Monthly Summary</h3>
+        <select class="chart-year-filter">
+          <option value="2026">This Year</option>
+        </select>
+      </div>
+      <div class="chart-canvas-container">
+        <canvas #barCanvas></canvas>
+      </div>
+    </div>
+  </div>
+</div>

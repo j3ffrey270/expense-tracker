@@ -1,0 +1,182 @@
+<div class="form-scrollable-content">
+  <div class="form-container-card">
+    <form (ngSubmit)="onSubmit()" class="transaction-form-layout">
+      <div class="form-group-item">
+        <label class="form-field-label">Type</label>
+        <div class="type-pill-toggle-group">
+          <button
+            type="button"
+            class="type-pill-option income-option"
+            [class.selected]="transactionType === 'income'"
+            (click)="setTransactionType('income')"
+          >
+            <ion-icon name="checkmark-circle-outline" *ngIf="transactionType === 'income'"></ion-icon>
+            <ion-icon name="trending-up-outline" *ngIf="transactionType !== 'income'"></ion-icon>
+            <span>Income</span>
+          </button>
+
+          <button
+            type="button"
+            class="type-pill-option expense-option"
+            [class.selected]="transactionType === 'expense'"
+            (click)="setTransactionType('expense')"
+          >
+            <ion-icon name="checkmark-circle-outline" *ngIf="transactionType === 'expense'"></ion-icon>
+            <ion-icon name="trending-down-outline" *ngIf="transactionType !== 'expense'"></ion-icon>
+            <span>Expense</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-field-label">Amount (₹)</label>
+        <div class="input-with-icon-box">
+          <span class="currency-prefix-symbol">₹</span>
+          <input
+            type="number"
+            class="custom-form-control"
+            placeholder="0.00"
+            [(ngModel)]="amount"
+            name="amount"
+            step="0.01"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <div class="field-label-row">
+          <label class="form-field-label">Category</label>
+          <button
+            type="button"
+            *ngIf="transactionType === 'expense'"
+            class="btn-inline-add-category"
+            (click)="toggleAddCategoryForm()"
+          >
+            + Add New Category
+          </button>
+        </div>
+
+        <div class="custom-select-box">
+          <select
+            class="custom-form-control"
+            [(ngModel)]="selectedCategoryId"
+            (change)="onCategorySelectChange()"
+            name="selectedCategoryId"
+            required
+          >
+            <option value="" disabled>Select Category</option>
+            <option *ngFor="let cat of availableCategories" [value]="cat.id">
+              {{ cat.name }}
+            </option>
+            <option value="ADD_NEW" *ngIf="transactionType === 'expense'">+ Add Custom Category...</option>
+          </select>
+          <ion-icon name="chevron-down-outline" class="select-chevron-icon"></ion-icon>
+        </div>
+
+        <div class="custom-category-inline-card" *ngIf="showAddCategoryForm && transactionType === 'expense'">
+          <div class="card-inline-header">
+            <span>Add New Expense Category</span>
+            <button type="button" class="btn-close-inline" (click)="toggleAddCategoryForm()">
+              <ion-icon name="close-outline"></ion-icon>
+            </button>
+          </div>
+
+
+          <div class="inline-field-group">
+            <input
+              type="text"
+              class="custom-form-control"
+              placeholder="Enter category name (e.g. Medical, Gym, Subscriptions)"
+              [(ngModel)]="newCategoryName"
+              name="newCategoryName"
+            />
+          </div>
+
+          <div class="inline-action-row">
+            <button
+              type="button"
+              class="btn-save-inline-cat"
+              (click)="saveCustomCategory()"
+            >
+              Save Category
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="form-group-item">
+        <label class="form-field-label">Date</label>
+        <div class="input-with-icon-box">
+          <input
+            type="date"
+            class="custom-form-control"
+            [(ngModel)]="dateString"
+            name="dateString"
+            required
+          />
+          <ion-icon name="calendar-outline" class="input-right-icon"></ion-icon>
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-field-label">Payment Method</label>
+        <div class="custom-select-box">
+          <select
+            class="custom-form-control"
+            [(ngModel)]="paymentMethod"
+            name="paymentMethod"
+          >
+            <option *ngFor="let pm of paymentMethods" [value]="pm">
+              {{ pm }}
+            </option>
+          </select>
+          <ion-icon name="chevron-down-outline" class="select-chevron-icon"></ion-icon>
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-field-label">Title / Note</label>
+        <input
+          type="text"
+          class="custom-form-control"
+          placeholder="e.g. Monthly Grocery Shopping"
+          [(ngModel)]="title"
+          name="title"
+          required
+        />
+      </div>
+
+      <div class="form-group-item">
+        <label class="form-field-label">Additional Notes (Optional)</label>
+        <textarea
+          class="custom-form-control textarea-control"
+          placeholder="Add extra details here..."
+          rows="3"
+          [(ngModel)]="notes"
+          name="notes"
+        ></textarea>
+      </div>
+
+      <div class="form-actions-row">
+        <button
+          type="button"
+          class="btn-form-cancel"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="submit"
+          class="btn-form-submit"
+          [disabled]="isSubmitting"
+        >
+          {{ isEditMode ? 'Save Changes' : 'Add Transaction' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

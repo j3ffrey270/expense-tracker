@@ -1,0 +1,307 @@
+<div class="transactions-scrollable-content">
+  <div class="transactions-container-card">
+    <div class="card-top-toolbar">
+      <div class="type-tab-pills">
+        <button
+          type="button"
+          class="tab-pill-btn"
+          [class.active]="selectedTypeTab === 'all'"
+          (click)="selectTypeTab('all')"
+        >
+          All
+        </button>
+
+        <button
+          type="button"
+          class="tab-pill-btn"
+          [class.active]="selectedTypeTab === 'income'"
+          (click)="selectTypeTab('income')"
+        >
+          Income
+        </button>
+
+        <button
+          type="button"
+          class="tab-pill-btn"
+          [class.active]="selectedTypeTab === 'expense'"
+          (click)="selectTypeTab('expense')"
+        >
+          Expense
+        </button>
+      </div>
+
+      <div class="toolbar-right-actions">
+        <div class="filter-dropdown-wrapper">
+          <button
+            type="button"
+            class="action-outline-btn"
+            (click)="toggleFilterDropdown()"
+          >
+            <ion-icon name="filter-outline"></ion-icon>
+            <span>Filter</span>
+          </button>
+
+          <div class="dropdown-popover custom-date-picker-popover" *ngIf="showCategoryDropdown">
+            <div class="date-picker-layout-container">
+              <div class="picker-sidebar-presets">
+                <button
+                  type="button"
+                  class="preset-item-btn"
+                  [class.active]="quickPreset === 'today'"
+                  (click)="applyQuickPreset('today')"
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  class="preset-item-btn"
+                  [class.active]="quickPreset === 'yesterday'"
+                  (click)="applyQuickPreset('yesterday')"
+                >
+                  Yesterday
+                </button>
+                <button
+                  type="button"
+                  class="preset-item-btn"
+                  [class.active]="quickPreset === 'last_week'"
+                  (click)="applyQuickPreset('last_week')"
+                >
+                  Last Week
+                </button>
+                <button
+                  type="button"
+                  class="preset-item-btn"
+                  [class.active]="quickPreset === 'this_month'"
+                  (click)="applyQuickPreset('this_month')"
+                >
+                  This Month
+                </button>
+                <button
+                  type="button"
+                  class="preset-item-btn"
+                  [class.active]="quickPreset === 'last_month'"
+                  (click)="applyQuickPreset('last_month')"
+                >
+                  Last Month
+                </button>
+                <button
+                  type="button"
+                  class="preset-item-btn"
+                  [class.active]="quickPreset === 'last_3_months'"
+                  (click)="applyQuickPreset('last_3_months')"
+                >
+                  Last 3 Months
+                </button>
+                <button
+                  type="button"
+                  class="preset-item-btn reset-btn"
+                  (click)="resetFilters()"
+                >
+                  Reset All
+                </button>
+              </div>
+
+              <div class="picker-main-calendar">
+                <div class="calendar-header-bar">
+                  <button type="button" class="month-nav-btn" (click)="prevMonth()">
+                    <ion-icon name="chevron-back-outline"></ion-icon>
+                  </button>
+                  <span class="month-year-title">{{ currentViewMonthYearLabel }}</span>
+                  <button type="button" class="month-nav-btn" (click)="nextMonth()">
+                    <ion-icon name="chevron-forward-outline"></ion-icon>
+                  </button>
+                </div>
+
+                <div class="calendar-weekdays-row">
+                  <span *ngFor="let dayName of weekdays" class="weekday-cell">{{ dayName }}</span>
+                </div>
+
+                <div class="calendar-days-grid">
+                  <div
+                    *ngFor="let day of calendarDays"
+                    class="calendar-day-cell"
+                    [class.other-month]="!day.isCurrentMonth"
+                    [class.is-today]="day.isToday"
+                    [class.selected-day]="day.isSelected"
+                    [class.in-range]="day.isInRange"
+                    (click)="onCalendarDayClick(day)"
+                  >
+                    <span class="day-number-text">{{ day.dayNumber }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+        </div>
+
+        <button
+          type="button"
+          class="action-primary-btn"
+          (click)="navigateToAdd()"
+        >
+          <ion-icon name="add-outline"></ion-icon>
+          <span>Add Transaction</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="table-responsive-box">
+      <table class="custom-transactions-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let tx of paginatedTransactions">
+            <td class="tx-date-cell">
+              {{ tx.date | date:'MMM dd, yyyy' }}
+            </td>
+
+            <td class="tx-desc-cell">
+              <div class="tx-desc-wrapper">
+                <span class="tx-title-bold">{{ tx.title }}</span>
+                <span class="tx-notes-sub" *ngIf="tx.notes">{{ tx.notes }}</span>
+              </div>
+            </td>
+
+            <td class="tx-category-cell">
+              <div class="category-tag-badge">
+                <span
+                  class="cat-icon-badge"
+                  [style.background-color]="tx.categoryColor + '20'"
+                  [style.color]="tx.categoryColor"
+                >
+                  <ion-icon [name]="tx.categoryIcon || 'card-outline'"></ion-icon>
+                </span>
+                <span class="cat-name-text">{{ tx.categoryName }}</span>
+              </div>
+            </td>
+
+            <td class="tx-type-cell">
+              <span
+                class="type-pill-tag"
+                [class.income-pill]="tx.type === 'income'"
+                [class.expense-pill]="tx.type === 'expense'"
+              >
+                <ion-icon
+                  [name]="tx.type === 'income' ? 'trending-up-outline' : 'trending-down-outline'"
+                ></ion-icon>
+                {{ tx.type === 'income' ? 'Income' : 'Expense' }}
+              </span>
+            </td>
+
+            <td class="tx-amount-cell">
+              <span
+                class="amount-value-text"
+                [class.income-val]="tx.type === 'income'"
+                [class.expense-val]="tx.type === 'expense'"
+              >
+                {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'INR':'symbol':'1.2-2' }}
+              </span>
+            </td>
+
+            <td class="tx-actions-cell text-right">
+              <button
+                type="button"
+                class="action-icon-btn edit-icon-btn"
+                title="Edit Transaction"
+                (click)="navigateToEdit(tx.id)"
+              >
+                <ion-icon name="create-outline"></ion-icon>
+              </button>
+
+              <button
+                type="button"
+                class="action-icon-btn delete-icon-btn"
+                title="Delete Transaction"
+                (click)="promptDelete(tx)"
+              >
+                <ion-icon name="trash-outline"></ion-icon>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="paginatedTransactions.length === 0">
+            <td colspan="6" class="empty-table-cell">
+              <div class="empty-state-content">
+                <ion-icon name="receipt-outline" class="empty-icon"></ion-icon>
+                <p>No transactions found.</p>
+                <button type="button" class="action-primary-btn" (click)="navigateToAdd()">
+                  Add your first transaction
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card-bottom-pagination">
+      <div class="entries-info-text">
+        Showing {{ filteredTransactions.length === 0 ? 0 : (currentPage - 1) * pageSize + 1 }}
+        to {{ (currentPage * pageSize) > filteredTransactions.length ? filteredTransactions.length : (currentPage * pageSize) }}
+        of {{ filteredTransactions.length }} entries
+      </div>
+
+      <div class="pagination-controls-box" *ngIf="totalPages > 1">
+        <button
+          type="button"
+          class="page-nav-btn"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(currentPage - 1)"
+        >
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </button>
+
+        <button
+          *ngFor="let page of totalPagesArray"
+          type="button"
+          class="page-num-btn"
+          [class.active]="currentPage === page"
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+
+        <button
+          type="button"
+          class="page-nav-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(currentPage + 1)"
+        >
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop-overlay" *ngIf="showDeleteModal">
+    <div class="delete-confirmation-modal">
+      <div class="modal-header-box">
+        <div class="modal-warning-icon">
+          <ion-icon name="trash-outline"></ion-icon>
+        </div>
+        <h3 class="modal-title-text">Delete Transaction</h3>
+      </div>
+      <div class="modal-body-text">
+        Are you sure you want to delete <strong>"{{ transactionToDelete?.title }}"</strong>? This action cannot be undone.
+      </div>
+      <div class="modal-footer-actions">
+        <button type="button" class="btn-secondary-grey" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button type="button" class="btn-danger-red" (click)="confirmDelete()">
+          Delete Transaction
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

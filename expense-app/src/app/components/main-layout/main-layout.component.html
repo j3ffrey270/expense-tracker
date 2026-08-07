@@ -1,0 +1,78 @@
+<ion-content class="dashboard-content-host">
+  <div class="dashboard-app-layout">
+
+    <aside class="sidebar-navigation">
+      <div class="sidebar-brand">
+        <div class="brand-logo-icon">
+          <ion-icon name="wallet-outline"></ion-icon>
+        </div>
+        <span class="brand-title-text">ExpenseTracker</span>
+      </div>
+
+      <nav class="sidebar-menu-list">
+        <button
+          type="button"
+          class="nav-item-btn"
+          [class.active]="activeRoute === 'dashboard'"
+          [routerLink]="['/dashboard']"
+        >
+          <ion-icon name="grid-outline"></ion-icon>
+          <span>Dashboard</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item-btn"
+          [class.active]="activeRoute === 'transactions'"
+          [routerLink]="['/transactions']"
+        >
+          <ion-icon name="receipt-outline"></ion-icon>
+          <span>Transactions</span>
+        </button>
+
+        <button
+          type="button"
+          class="nav-item-btn"
+          [class.active]="activeRoute === 'add-transaction'"
+          [routerLink]="['/add-transaction']"
+        >
+          <ion-icon name="add-circle-outline"></ion-icon>
+          <span>Add Transaction</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="nav-item-btn logout-btn" (click)="onLogout()">
+          <ion-icon name="log-out-outline"></ion-icon>
+          <span>Logout</span>
+        </button>
+      </div>
+    </aside>
+
+    <main class="main-dashboard-body">
+
+      <header class="top-header-navbar">
+        <div class="header-left-title">
+          <h1 class="page-main-heading">{{ pageTitle }}</h1>
+          <p class="greeting-subtitle">{{ pageSubtitle }}</p>
+        </div>
+
+        <div class="header-right-controls">
+          <div class="user-profile-dropdown">
+            <div class="profile-avatar-circle">
+              <span>{{ (currentUser?.name || 'J')[0] }}</span>
+            </div>
+            <span class="user-display-name">{{ currentUser?.name || 'John Doe' }}</span>
+            <ion-icon name="chevron-down-outline" class="dropdown-chevron"></ion-icon>
+          </div>
+        </div>
+      </header>
+
+      <div class="main-page-router-content">
+        <router-outlet></router-outlet>
+      </div>
+
+    </main>
+
+  </div>
+</ion-content>

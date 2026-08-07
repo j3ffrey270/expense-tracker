@@ -9,11 +9,17 @@ import { StorageService } from './storage.service';
 })
 export class TransactionService {
   private readonly TRANSACTIONS_KEY = 'user_transactions';
+  private readonly CATEGORIES_KEY = 'user_categories';
+
   private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
   public transactions$: Observable<Transaction[]> = this.transactionsSubject.asObservable();
 
+  private categoriesSubject = new BehaviorSubject<Category[]>(DEFAULT_CATEGORIES);
+  public categories$: Observable<Category[]> = this.categoriesSubject.asObservable();
+
   constructor(private storageService: StorageService) {
     this.initTransactions();
+    this.initCategories();
   }
 
   private async initTransactions(): Promise<void> {
@@ -25,8 +31,39 @@ export class TransactionService {
     this.transactionsSubject.next(list);
   }
 
+  private async initCategories(): Promise<void> {
+    let list = await this.storageService.get<Category[]>(this.CATEGORIES_KEY);
+    if (!list || list.length === 0) {
+      list = DEFAULT_CATEGORIES;
+      await this.storageService.set(this.CATEGORIES_KEY, list);
+    }
+    this.categoriesSubject.next(list);
+  }
+
+  getCategories(): Category[] {
+    return this.categoriesSubject.value;
+  }
+
+  async addCustomCategory(category: Omit<Category, 'id'>): Promise<Category> {
+    const newCat: Category = {
+      ...category,
+      id: `cat_custom_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`
+    };
+
+    const currentList = this.categoriesSubject.value;
+    const updated = [...currentList, newCat];
+    await this.storageService.set(this.CATEGORIES_KEY, updated);
+    this.categoriesSubject.next(updated);
+    return newCat;
+  }
+
+
   async getTransactions(): Promise<Transaction[]> {
     return this.transactionsSubject.value;
+  }
+
+  getTransactionById(id: string): Transaction | undefined {
+    return this.transactionsSubject.value.find((t) => t.id === id);
   }
 
   async addTransaction(transaction: Omit<Transaction, 'id' | 'createdAt'>): Promise<Transaction> {
@@ -83,15 +120,28 @@ export class TransactionService {
           return false;
         }
       }
-      if (filter.startDate && new Date(tx.date) < new Date(filter.startDate)) {
-        return false;
-      }
-      if (filter.endDate && new Date(tx.date) > new Date(filter.endDate)) {
-        return false;
+
+      if (tx.date) {
+        const txDate = new Date(tx.date);
+        if (!isNaN(txDate.getTime())) {
+          if (filter.year && filter.year !== 'all' && txDate.getFullYear().toString() !== filter.year) {
+            return false;
+          }
+          if (filter.month && filter.month !== 'all' && txDate.getMonth().toString() !== filter.month) {
+            return false;
+          }
+          if (filter.startDate && tx.date < filter.startDate) {
+            return false;
+          }
+          if (filter.endDate && tx.date > filter.endDate) {
+            return false;
+          }
+        }
       }
       return true;
     });
   }
+
 
   getTotalBalance(transactions: Transaction[]): number {
     const income = this.getTotalIncome(transactions);
@@ -168,6 +218,7 @@ export class TransactionService {
         categoryName: 'Salary',
         categoryIcon: 'cash-outline',
         categoryColor: '#2dd36f',
+        paymentMethod: 'Bank Transfer',
         date: today,
         notes: 'Monthly tech company salary',
         createdAt: new Date().toISOString()
@@ -182,6 +233,7 @@ export class TransactionService {
         categoryName: 'Food & Dining',
         categoryIcon: 'fast-food-outline',
         categoryColor: '#ff4961',
+        paymentMethod: 'Credit Card',
         date: today,
         notes: 'Supermarket supplies',
         createdAt: new Date().toISOString()
@@ -196,6 +248,7 @@ export class TransactionService {
         categoryName: 'Bills & Utilities',
         categoryIcon: 'receipt-outline',
         categoryColor: '#92949c',
+        paymentMethod: 'Debit Card',
         date: today,
         notes: 'Monthly electric utility',
         createdAt: new Date().toISOString()
@@ -210,6 +263,7 @@ export class TransactionService {
         categoryName: 'Entertainment',
         categoryIcon: 'film-outline',
         categoryColor: '#5260ff',
+        paymentMethod: 'Credit Card',
         date: today,
         notes: 'Premium streaming plan',
         createdAt: new Date().toISOString()
@@ -224,10 +278,12 @@ export class TransactionService {
         categoryName: 'Freelance',
         categoryIcon: 'laptop-outline',
         categoryColor: '#3dc2ff',
+        paymentMethod: 'PayPal',
         date: today,
         notes: 'UI Design project payment',
         createdAt: new Date().toISOString()
       }
+
     ];
   }
 }

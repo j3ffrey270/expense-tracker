@@ -1,11 +1,13 @@
 import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   gridOutline,
+  receiptOutline,
+  addCircleOutline,
   logOutOutline,
   searchOutline,
   notificationsOutline,
@@ -40,10 +42,12 @@ Chart.register(...registerables);
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     IonContent,
     IonIcon
   ]
 })
+
 export class DashboardPage implements OnInit, AfterViewInit {
   @ViewChild('lineCanvas') lineCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('doughnutCanvas') doughnutCanvas!: ElementRef<HTMLCanvasElement>;
@@ -79,6 +83,8 @@ export class DashboardPage implements OnInit, AfterViewInit {
   ) {
     addIcons({
       gridOutline,
+      receiptOutline,
+      addCircleOutline,
       logOutOutline,
       searchOutline,
       notificationsOutline,
@@ -94,6 +100,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
       filmOutline,
       chevronDownOutline
     });
+
   }
 
   ngOnInit(): void {
