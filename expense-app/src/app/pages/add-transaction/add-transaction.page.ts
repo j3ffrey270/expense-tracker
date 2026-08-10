@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { addIcons } from 'ionicons';
 import {
@@ -43,7 +43,6 @@ import { User } from '../../core/models/user.model';
     CommonModule,
     FormsModule,
     RouterModule,
-    IonContent,
     IonIcon
   ]
 })
@@ -62,14 +61,6 @@ export class AddTransactionPage implements OnInit {
 
   allCategories: Category[] = [];
   availableCategories: Category[] = [];
-
-  showAddCategoryForm = false;
-  newCategoryName = '';
-  newCategoryColor = '#ff4961';
-  newCategoryIcon = 'pricetags-outline';
-
-  colorOptions: string[] = ['#ff4961', '#ffc409', '#2dd36f', '#3dc2ff', '#5260ff', '#7044ff', '#eb445a', '#92949c'];
-  iconOptions: string[] = ['pricetags-outline', 'fast-food-outline', 'car-outline', 'receipt-outline', 'bag-handle-outline', 'film-outline', 'laptop-outline', 'cash-outline'];
 
   paymentMethods: string[] = [
     'Cash',
@@ -138,13 +129,8 @@ export class AddTransactionPage implements OnInit {
 
   setTransactionType(type: TransactionType): void {
     this.transactionType = type;
-    if (type === 'income') {
-      this.showAddCategoryForm = false;
-    }
-    this.newCategoryColor = type === 'income' ? '#2dd36f' : '#ff4961';
     this.updateAvailableCategories();
   }
-
 
   updateAvailableCategories(): void {
     const list = this.allCategories.length ? this.allCategories : DEFAULT_CATEGORIES;
@@ -159,39 +145,6 @@ export class AddTransactionPage implements OnInit {
     if (!matchesCurrent && this.availableCategories.length > 0) {
       this.selectedCategoryId = this.availableCategories[0].id;
     }
-  }
-
-  onCategorySelectChange(): void {
-    if (this.selectedCategoryId === 'ADD_NEW') {
-      this.showAddCategoryForm = true;
-      this.selectedCategoryId = '';
-    }
-  }
-
-  toggleAddCategoryForm(): void {
-    this.showAddCategoryForm = !this.showAddCategoryForm;
-  }
-
-  async saveCustomCategory(): Promise<void> {
-    if (!this.newCategoryName || this.newCategoryName.trim() === '') {
-      this.toastService.show('Please enter a category name.', 'warning');
-      return;
-    }
-
-    const defaultIcon = this.transactionType === 'income' ? 'cash-outline' : 'pricetags-outline';
-    const defaultColor = this.transactionType === 'income' ? '#2dd36f' : '#ff4961';
-
-    const created = await this.transactionService.addCustomCategory({
-      name: this.newCategoryName.trim(),
-      type: this.transactionType,
-      icon: defaultIcon,
-      color: defaultColor
-    });
-
-    this.toastService.show(`Category "${created.name}" added successfully!`, 'success');
-    this.selectedCategoryId = created.id;
-    this.newCategoryName = '';
-    this.showAddCategoryForm = false;
   }
 
 

@@ -1,37 +1,298 @@
-/*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
- */
-
-/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
+@import "@ionic/angular/css/palettes/dark.class.css";
 
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import '@ionic/angular/css/palettes/dark.system.css';
+body.dark-theme {
+  --ion-background-color: #0f172a;
+  --ion-text-color: #f8fafc;
+  --ion-card-background: #1e293b;
+  --ion-item-background: #1e293b;
+
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+
+  .dashboard-app-layout,
+  .dashboard-content-host,
+  .main-dashboard-body,
+  .page-content,
+  .dashboard-scrollable-content,
+  .transactions-scrollable-content,
+  .categories-scrollable-content,
+  .form-scrollable-content,
+  .transactions-page-content,
+  .form-page-content {
+    background-color: #0f172a !important;
+    color: #f8fafc !important;
+  }
+
+  .sidebar-navigation {
+    background-color: #0f172a !important;
+    border-right-color: #1e293b !important;
+    color: #f8fafc !important;
+
+    .sidebar-brand .brand-title-text {
+      color: #ffffff !important;
+    }
+
+    .sidebar-menu-list .nav-item-btn {
+      color: #94a3b8 !important;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.06) !important;
+        color: #f8fafc !important;
+      }
+
+      &.active {
+        background: #4f46e5 !important;
+        color: #ffffff !important;
+      }
+    }
+
+    .sidebar-footer {
+      border-top-color: rgba(255, 255, 255, 0.08) !important;
+
+      .logout-btn {
+        background-color: rgba(239, 68, 68, 0.1) !important;
+        border-color: rgba(239, 68, 68, 0.25) !important;
+        color: #f87171 !important;
+
+        ion-icon {
+          color: #f87171 !important;
+        }
+
+        &:hover {
+          background-color: rgba(239, 68, 68, 0.25) !important;
+          color: #ef4444 !important;
+        }
+      }
+    }
+  }
+
+  .top-header-navbar {
+    background-color: #0f172a !important;
+    border-bottom-color: #1e293b !important;
+
+    .page-main-heading {
+      color: #f8fafc !important;
+    }
+
+    .greeting-subtitle {
+      color: #94a3b8 !important;
+    }
+
+    .header-search-input {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f8fafc !important;
+
+      &::placeholder {
+        color: #64748b !important;
+      }
+    }
+
+    .icon-circle-btn {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #94a3b8 !important;
+
+      &:hover {
+        background-color: #334155 !important;
+        color: #ffffff !important;
+      }
+    }
+
+    .user-profile-dropdown {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+
+      .user-display-name {
+        color: #f8fafc !important;
+      }
+    }
+  }
+
+  .stat-card,
+  .dashboard-chart-card,
+  .dashboard-card,
+  .transactions-container-card,
+  .categories-container-card,
+  .category-card-item,
+  .category-modal-card,
+  .form-container-card,
+  .custom-category-inline-card,
+  .delete-confirmation-modal,
+  .custom-date-picker-popover,
+  .transactions-list-card,
+  .tx-form-card,
+  .filters-card,
+  .auth-form {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  }
+
+  .chart-card-title,
+  .stat-label-title,
+  .stat-amount-value,
+  .stat-title,
+  .stat-amount,
+  .card-title,
+  .form-title,
+  .tx-title,
+  .field-label,
+  .form-field-label,
+  .card-inline-header,
+  .tx-title-bold,
+  .cat-name-text,
+  .cat-name,
+  .modal-title-text,
+  .month-year-title,
+  .weekday-cell,
+  .calendar-day-cell,
+  .tx-item-title,
+  .legend-amount,
+  .legend-category-name {
+    color: #f8fafc !important;
+  }
+
+  .stat-subtitle,
+  .card-subtitle,
+  .greeting-subtitle,
+  .tx-date,
+  .tx-date-cell,
+  .form-subtitle,
+  .empty-subtitle,
+  .entries-info-text,
+  .legend-pct,
+  .tx-item-category,
+  .currency-prefix-symbol,
+  .select-chevron-icon,
+  .input-right-icon,
+  .search-icon {
+    color: #94a3b8 !important;
+  }
+
+  .custom-transactions-table {
+    th {
+      background-color: #0f172a !important;
+      color: #94a3b8 !important;
+      border-bottom-color: #334155 !important;
+    }
+
+    td {
+      color: #f8fafc !important;
+      border-bottom-color: #334155 !important;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.04) !important;
+    }
+  }
+
+  .transaction-row-item {
+    background-color: #0f172a !important;
+
+    &:hover {
+      background-color: #334155 !important;
+    }
+  }
+
+  .type-tab-pills {
+    background-color: #0f172a !important;
+
+    .tab-pill-btn {
+      color: #94a3b8 !important;
+
+      &.active {
+        background-color: #4f46e5 !important;
+        color: #ffffff !important;
+      }
+    }
+  }
+
+  .action-outline-btn,
+  .delete-cat-btn,
+  .icon-badge-btn,
+  .chart-year-filter,
+  .page-nav-btn,
+  .page-num-btn,
+  .action-icon-btn {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+
+    &:hover {
+      background-color: #334155 !important;
+    }
+  }
+
+  .custom-form-control,
+  .custom-input,
+  .custom-select,
+  .search-input {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+
+    &::placeholder {
+      color: #64748b !important;
+    }
+
+    &:focus {
+      border-color: #6366f1 !important;
+    }
+  }
+
+  .type-pill-option {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+
+    &.income-option.selected {
+      background-color: rgba(34, 197, 94, 0.15) !important;
+      border-color: #22c55e !important;
+      color: #4ade80 !important;
+    }
+
+    &.expense-option.selected {
+      background-color: rgba(239, 68, 68, 0.15) !important;
+      border-color: #ef4444 !important;
+      color: #f87171 !important;
+    }
+  }
+
+  .btn-form-cancel,
+  .btn-form-cancel:hover,
+  .cancel-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #cbd5e1 !important;
+  }
+
+  .filter-pill {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+    color: #94a3b8 !important;
+
+    &.active {
+      background-color: #4f46e5 !important;
+      color: #ffffff !important;
+    }
+  }
+
+  .theme-toggle-btn {
+    background-color: #1e293b !important;
+    border-color: #334155 !important;
+    color: #fbbf24 !important;
+  }
+}

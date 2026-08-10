@@ -6,13 +6,17 @@ import { addIcons } from 'ionicons';
 import {
   gridOutline,
   receiptOutline,
+  pricetagsOutline,
   addCircleOutline,
   walletOutline,
   chevronDownOutline,
-  logOutOutline
+  logOutOutline,
+  sunnyOutline,
+  moonOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { User } from '../../core/models/user.model';
 import { filter } from 'rxjs/operators';
 
@@ -33,19 +37,24 @@ export class MainLayoutComponent implements OnInit {
   activeRoute = 'dashboard';
   pageTitle = 'Dashboard';
   pageSubtitle = 'Welcome back!';
+  isDarkMode = false;
 
   constructor(
     private authService: AuthService,
     private toastService: ToastService,
+    private themeService: ThemeService,
     private router: Router
   ) {
     addIcons({
       gridOutline,
       receiptOutline,
+      pricetagsOutline,
       addCircleOutline,
       walletOutline,
       chevronDownOutline,
-      logOutOutline
+      logOutOutline,
+      sunnyOutline,
+      moonOutline
     });
   }
 
@@ -54,6 +63,10 @@ export class MainLayoutComponent implements OnInit {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
       this.updateHeaderTitles();
+    });
+
+    this.themeService.darkMode$.subscribe((dark) => {
+      this.isDarkMode = dark;
     });
 
     this.updateActiveRouteFromUrl(this.router.url);
@@ -65,11 +78,21 @@ export class MainLayoutComponent implements OnInit {
       });
   }
 
+  async toggleTheme(): Promise<void> {
+    const isDark = await this.themeService.toggleDarkMode();
+    const modeName = isDark ? 'Dark Mode' : 'Light Mode';
+    await this.toastService.show(`${modeName} activated`, 'info');
+  }
+
   private updateActiveRouteFromUrl(url: string): void {
     if (url.includes('/transactions')) {
       this.activeRoute = 'transactions';
       this.pageTitle = 'Transactions';
       this.pageSubtitle = 'Manage your all transactions';
+    } else if (url.includes('/categories')) {
+      this.activeRoute = 'categories';
+      this.pageTitle = 'Manage Categories';
+      this.pageSubtitle = 'Create, view and manage income & expense categories';
     } else if (url.includes('/add-transaction')) {
       this.activeRoute = 'add-transaction';
       this.pageTitle = 'Add Transaction';

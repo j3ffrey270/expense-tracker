@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild, AfterViewInit } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { IonContent, IonIcon } from '@ionic/angular/standalone';
+import { IonIcon } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import {
   gridOutline,
@@ -21,7 +21,9 @@ import {
   carOutline,
   bagHandleOutline,
   filmOutline,
-  chevronDownOutline
+  chevronDownOutline,
+  arrowDownCircleOutline,
+  arrowUpCircleOutline
 } from 'ionicons/icons';
 import { Chart, registerables } from 'chart.js';
 import { TransactionService } from '../../core/services/transaction.service';
@@ -43,11 +45,9 @@ Chart.register(...registerables);
     CommonModule,
     FormsModule,
     RouterModule,
-    IonContent,
     IonIcon
   ]
 })
-
 export class DashboardPage implements OnInit, AfterViewInit {
   @ViewChild('lineCanvas') lineCanvas!: ElementRef<HTMLCanvasElement>;
   @ViewChild('doughnutCanvas') doughnutCanvas!: ElementRef<HTMLCanvasElement>;
@@ -61,6 +61,9 @@ export class DashboardPage implements OnInit, AfterViewInit {
   searchQuery = '';
   selectedCategoryFilter = 'all';
   selectedTypeFilter: 'all' | 'income' | 'expense' = 'all';
+
+  selectedLineTimeRange = 'this_year';
+  selectedBarTimeRange = 'this_year';
 
   totalBalance = 0;
   totalIncome = 0;
@@ -98,9 +101,10 @@ export class DashboardPage implements OnInit, AfterViewInit {
       carOutline,
       bagHandleOutline,
       filmOutline,
-      chevronDownOutline
+      chevronDownOutline,
+      arrowDownCircleOutline,
+      arrowUpCircleOutline
     });
-
   }
 
   ngOnInit(): void {
@@ -113,7 +117,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
       this.transactions = txs;
       this.applyFilters();
       this.recalculateStats();
-      this.updateCharts();
+      this.updateAllCharts();
     });
 
     this.currencyService.getExchangeRates().subscribe();
@@ -149,10 +153,93 @@ export class DashboardPage implements OnInit, AfterViewInit {
     this.applyFilters();
   }
 
+  onLineTimeRangeChange(): void {
+    this.updateLineChart();
+  }
+
+  onBarTimeRangeChange(): void {
+    this.updateBarChart();
+  }
+
   async onLogout(): Promise<void> {
     await this.authService.logout();
     await this.toastService.show('Logged out successfully.', 'info');
     this.router.navigate(['/login']);
+  }
+
+  private calculateChartData(range: string): { labels: string[]; income: number[]; expense: number[] } {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    if (range === 'this_month') {
+      const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+      const income = [0, 0, 0, 0];
+      const expense = [0, 0, 0, 0];
+
+      this.transactions.forEach((tx) => {
+        if (!tx.date) return;
+        const d = new Date(tx.date);
+        if (d.getFullYear() === currentYear && d.getMonth() === currentMonth) {
+          const day = d.getDate();
+          let weekIdx = 0;
+          if (day > 21) weekIdx = 3;
+          else if (day > 14) weekIdx = 2;
+          else if (day > 7) weekIdx = 1;
+
+          const amt = Number(tx.amount);
+          if (tx.type === 'income') income[weekIdx] += amt;
+          else expense[weekIdx] += amt;
+        }
+      });
+
+      return { labels: weeks, income, expense };
+    } else if (range === 'last_6_months') {
+      const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const labels: string[] = [];
+      const income: number[] = [];
+      const expense: number[] = [];
+
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const y = d.getFullYear();
+        const m = d.getMonth();
+        labels.push(monthNames[m]);
+
+        let incSum = 0;
+        let expSum = 0;
+        this.transactions.forEach((tx) => {
+          if (!tx.date) return;
+          const txD = new Date(tx.date);
+          if (txD.getFullYear() === y && txD.getMonth() === m) {
+            const amt = Number(tx.amount);
+            if (tx.type === 'income') incSum += amt;
+            else expSum += amt;
+          }
+        });
+        income.push(incSum);
+        expense.push(expSum);
+      }
+
+      return { labels, income, expense };
+    } else {
+      const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const income = new Array(12).fill(0);
+      const expense = new Array(12).fill(0);
+
+      this.transactions.forEach((tx) => {
+        if (!tx.date) return;
+        const d = new Date(tx.date);
+        if (d.getFullYear() === currentYear) {
+          const m = d.getMonth();
+          const amt = Number(tx.amount);
+          if (tx.type === 'income') income[m] += amt;
+          else expense[m] += amt;
+        }
+      });
+
+      return { labels, income, expense };
+    }
   }
 
   private renderCharts(): void {
@@ -161,17 +248,40 @@ export class DashboardPage implements OnInit, AfterViewInit {
     this.renderBarChart();
   }
 
-  private updateCharts(): void {
-    if (!this.lineChart || !this.doughnutChart || !this.barChart) return;
+  private updateAllCharts(): void {
+    this.updateDoughnutChart();
+    this.updateLineChart();
+    this.updateBarChart();
+  }
 
-    const labels = this.categoryBreakdown.map((b) => b.category.name);
-    const data = this.categoryBreakdown.map((b) => b.amount);
-    const colors = this.categoryBreakdown.map((b) => b.category.color);
+  private updateDoughnutChart(): void {
+    if (!this.doughnutChart) return;
+    const catLabels = this.categoryBreakdown.map((b) => b.category.name);
+    const catData = this.categoryBreakdown.map((b) => b.amount);
+    const catColors = this.categoryBreakdown.map((b) => b.category.color);
 
-    this.doughnutChart.data.labels = labels.length ? labels : ['No Expenses'];
-    this.doughnutChart.data.datasets[0].data = data.length ? data : [1];
-    this.doughnutChart.data.datasets[0].backgroundColor = colors.length ? colors : ['#cbd5e1'];
+    this.doughnutChart.data.labels = catLabels.length ? catLabels : ['No Expenses'];
+    this.doughnutChart.data.datasets[0].data = catData.length ? catData : [1];
+    this.doughnutChart.data.datasets[0].backgroundColor = catColors.length ? catColors : ['#cbd5e1'];
     this.doughnutChart.update();
+  }
+
+  private updateLineChart(): void {
+    if (!this.lineChart) return;
+    const chartData = this.calculateChartData(this.selectedLineTimeRange);
+    this.lineChart.data.labels = chartData.labels;
+    this.lineChart.data.datasets[0].data = chartData.income;
+    this.lineChart.data.datasets[1].data = chartData.expense;
+    this.lineChart.update();
+  }
+
+  private updateBarChart(): void {
+    if (!this.barChart) return;
+    const chartData = this.calculateChartData(this.selectedBarTimeRange);
+    this.barChart.data.labels = chartData.labels;
+    this.barChart.data.datasets[0].data = chartData.income;
+    this.barChart.data.datasets[1].data = chartData.expense;
+    this.barChart.update();
   }
 
   private renderLineChart(): void {
@@ -179,14 +289,16 @@ export class DashboardPage implements OnInit, AfterViewInit {
     const ctx = this.lineCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    const chartData = this.calculateChartData(this.selectedLineTimeRange);
+
     this.lineChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: chartData.labels,
         datasets: [
           {
             label: 'Income',
-            data: [3200, 3500, 4100, 3800, 4500, 4200, 4800, 5100, 4900, 5300, 5200, 5600],
+            data: chartData.income,
             borderColor: '#10b981',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             tension: 0.4,
@@ -194,7 +306,7 @@ export class DashboardPage implements OnInit, AfterViewInit {
           },
           {
             label: 'Expenses',
-            data: [2100, 2300, 1900, 2500, 2200, 2700, 2400, 2900, 2600, 2800, 3100, 2950],
+            data: chartData.expense,
             borderColor: '#4f46e5',
             backgroundColor: 'rgba(79, 70, 229, 0.1)',
             tension: 0.4,
@@ -253,20 +365,22 @@ export class DashboardPage implements OnInit, AfterViewInit {
     const ctx = this.barCanvas.nativeElement.getContext('2d');
     if (!ctx) return;
 
+    const chartData = this.calculateChartData(this.selectedBarTimeRange);
+
     this.barChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: chartData.labels,
         datasets: [
           {
             label: 'Income',
-            data: [3200, 3500, 4100, 3800, 4500, 4200, 4800, 5100, 4900, 5300, 5200, 5600],
+            data: chartData.income,
             backgroundColor: '#10b981',
             borderRadius: 4
           },
           {
             label: 'Expenses',
-            data: [2100, 2300, 1900, 2500, 2200, 2700, 2400, 2900, 2600, 2800, 3100, 2950],
+            data: chartData.expense,
             backgroundColor: '#4f46e5',
             borderRadius: 4
           }

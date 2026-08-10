@@ -1,4 +1,44 @@
 <div class="dashboard-scrollable-content">
+  <div class="dashboard-filter-toolbar">
+    <div class="search-input-box">
+      <ion-icon name="search-outline" class="search-icon"></ion-icon>
+      <input
+        type="text"
+        class="custom-form-control search-input"
+        placeholder="Search transactions..."
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <div class="type-filter-pills">
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedTypeFilter === 'all'"
+        (click)="selectedTypeFilter = 'all'; applyFilters()"
+      >
+        All
+      </button>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedTypeFilter === 'income'"
+        (click)="selectedTypeFilter = 'income'; applyFilters()"
+      >
+        Income
+      </button>
+      <button
+        type="button"
+        class="filter-pill"
+        [class.active]="selectedTypeFilter === 'expense'"
+        (click)="selectedTypeFilter = 'expense'; applyFilters()"
+      >
+        Expense
+      </button>
+    </div>
+  </div>
+
   <div class="overview-cards-grid">
     <div class="stat-card balance-card">
       <div class="stat-card-icon-badge blue-badge">
@@ -57,8 +97,10 @@
     <div class="dashboard-chart-card line-chart-wrapper">
       <div class="chart-card-header">
         <h3 class="chart-card-title">Income vs Expenses</h3>
-        <select class="chart-year-filter">
-          <option value="2026">This Year</option>
+        <select class="chart-year-filter" [(ngModel)]="selectedLineTimeRange" (change)="onLineTimeRangeChange()">
+          <option value="this_year">This Year</option>
+          <option value="this_month">This Month</option>
+          <option value="last_6_months">Last 6 Months</option>
         </select>
       </div>
       <div class="chart-canvas-container">
@@ -134,8 +176,10 @@
     <div class="dashboard-card monthly-bar-card">
       <div class="chart-card-header">
         <h3 class="chart-card-title">Monthly Summary</h3>
-        <select class="chart-year-filter">
-          <option value="2026">This Year</option>
+        <select class="chart-year-filter" [(ngModel)]="selectedBarTimeRange" (change)="onBarTimeRangeChange()">
+          <option value="this_year">This Year</option>
+          <option value="this_month">This Month</option>
+          <option value="last_6_months">Last 6 Months</option>
         </select>
       </div>
       <div class="chart-canvas-container">

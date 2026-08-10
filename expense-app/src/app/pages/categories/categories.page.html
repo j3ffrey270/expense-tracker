@@ -1,0 +1,170 @@
+<div class="categories-scrollable-content">
+  <div class="categories-container-card">
+
+    <div class="card-top-toolbar">
+      <div class="type-tab-pills">
+        <button
+          type="button"
+          class="tab-pill-btn"
+          [class.active]="selectedTypeTab === 'all'"
+          (click)="setFilterTab('all')"
+        >
+          All Categories ({{ categories.length }})
+        </button>
+        <button
+          type="button"
+          class="tab-pill-btn"
+          [class.active]="selectedTypeTab === 'income'"
+          (click)="setFilterTab('income')"
+        >
+          Income
+        </button>
+        <button
+          type="button"
+          class="tab-pill-btn"
+          [class.active]="selectedTypeTab === 'expense'"
+          (click)="setFilterTab('expense')"
+        >
+          Expense
+        </button>
+      </div>
+
+      <button type="button" class="action-primary-btn" (click)="openAddModal()">
+        <ion-icon name="add-outline"></ion-icon>
+        <span>Add Category</span>
+      </button>
+    </div>
+
+    <div class="categories-grid-container">
+      <div *ngFor="let cat of filteredCategories" class="category-card-item">
+        <div class="cat-card-left">
+          <div class="cat-icon-badge" [style.background-color]="cat.color + '22'" [style.color]="cat.color">
+            <ion-icon [name]="cat.icon"></ion-icon>
+          </div>
+          <div class="cat-details">
+            <h3 class="cat-name">{{ cat.name }}</h3>
+            <span class="cat-type-tag" [class.income-type]="cat.type === 'income'" [class.expense-type]="cat.type === 'expense'">
+              {{ cat.type === 'income' ? 'Income' : 'Expense' }}
+            </span>
+          </div>
+        </div>
+
+        <div class="cat-card-right">
+          <button type="button" class="delete-cat-btn" (click)="confirmDeleteCategory(cat)" title="Delete Category">
+            <ion-icon name="trash-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="filteredCategories.length === 0" class="empty-state-box">
+      <ion-icon name="pricetags-outline" class="empty-icon"></ion-icon>
+      <p>No categories found for this filter.</p>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="showAddModal" class="modal-backdrop-overlay">
+  <div class="category-modal-card">
+    <div class="modal-header-bar">
+      <h2 class="modal-title-text">Add New Category</h2>
+      <button type="button" class="close-modal-btn" (click)="closeAddModal()">
+        <ion-icon name="close-outline"></ion-icon>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveCategory()" class="modal-form-body">
+      <div class="form-group-item">
+        <label class="modal-label">Category Name</label>
+        <input
+          type="text"
+          class="custom-form-control"
+          placeholder="e.g. Subscriptions, Investments"
+          [(ngModel)]="newCatName"
+          name="newCatName"
+          required
+        />
+      </div>
+
+      <div class="form-group-item">
+        <label class="modal-label">Category Type</label>
+        <div class="type-segmented-control">
+          <button
+            type="button"
+            class="seg-btn"
+            [class.active]="newCatType === 'expense'"
+            (click)="newCatType = 'expense'"
+          >
+            Expense
+          </button>
+          <button
+            type="button"
+            class="seg-btn"
+            [class.active]="newCatType === 'income'"
+            (click)="newCatType = 'income'"
+          >
+            Income
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="modal-label">Select Color</label>
+        <div class="color-picker-grid">
+          <button
+            *ngFor="let col of colorOptions"
+            type="button"
+            class="color-circle-btn"
+            [style.background-color]="col"
+            [class.selected]="newCatColor === col"
+            (click)="selectColor(col)"
+          >
+            <ion-icon *ngIf="newCatColor === col" name="checkmark-outline"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group-item">
+        <label class="modal-label">Select Icon</label>
+        <div class="icon-picker-grid">
+          <button
+            *ngFor="let ic of iconOptions"
+            type="button"
+            class="icon-badge-btn"
+            [class.selected]="newCatIcon === ic"
+            (click)="selectIcon(ic)"
+          >
+            <ion-icon [name]="ic"></ion-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-action-row">
+        <button type="button" class="cancel-btn" (click)="closeAddModal()">Cancel</button>
+        <button type="submit" class="save-btn">Save Category</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div *ngIf="showDeleteModal" class="modal-backdrop-overlay">
+  <div class="delete-confirmation-modal">
+    <div class="modal-header-box">
+      <div class="modal-warning-icon">
+        <ion-icon name="trash-outline"></ion-icon>
+      </div>
+      <div>
+        <h3 class="modal-title-text">Delete Category</h3>
+        <p class="modal-warning-desc">
+          Are you sure you want to delete category <strong>"{{ categoryToDelete?.name }}"</strong>?
+        </p>
+      </div>
+    </div>
+
+    <div class="modal-action-row">
+      <button type="button" class="cancel-btn" (click)="closeDeleteModal()">Cancel</button>
+      <button type="button" class="delete-confirm-btn" (click)="deleteCategory()">Delete</button>
+    </div>
+  </div>
+</div>

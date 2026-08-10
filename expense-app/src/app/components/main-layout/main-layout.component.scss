@@ -22,8 +22,9 @@
   width: 240px;
   min-width: 240px;
   height: 100vh;
-  background-color: #0f172a;
-  color: #f8fafc;
+  background-color: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  color: #0f172a;
   display: flex;
   flex-direction: column;
   padding: 24px 16px;
@@ -52,7 +53,7 @@
       font-size: 18px;
       font-weight: 700;
       letter-spacing: -0.3px;
-      color: #ffffff;
+      color: #0f172a;
     }
   }
 
@@ -70,7 +71,7 @@
       padding: 12px 14px;
       border: none;
       background: transparent;
-      color: #94a3b8;
+      color: #64748b;
       border-radius: 10px;
       font-size: 14px;
       font-weight: 500;
@@ -82,28 +83,57 @@
       }
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.06);
-        color: #f8fafc;
+        background-color: #f1f5f9;
+        color: #0f172a;
       }
 
       &.active {
-        background: #4f46e5;
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
         color: #ffffff;
         font-weight: 600;
-        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
       }
     }
   }
 
   .sidebar-footer {
+    margin-top: auto;
     padding-top: 16px;
+    padding-bottom: 8px;
+    border-top: 1px solid #e2e8f0;
+    width: 100%;
 
     .logout-btn {
-      color: #f87171;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      background-color: rgba(239, 68, 68, 0.06);
+      color: #ef4444;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition: all 0.2s ease;
+
+      ion-icon {
+        font-size: 18px;
+        color: #ef4444;
+        transition: transform 0.2s ease;
+      }
 
       &:hover {
-        background-color: rgba(248, 113, 113, 0.1);
-        color: #ef4444;
+        background-color: rgba(239, 68, 68, 0.12);
+        color: #dc2626;
+        border-color: rgba(239, 68, 68, 0.4);
+
+        ion-icon {
+          color: #dc2626;
+          transform: translateX(2px);
+        }
       }
     }
   }
@@ -149,6 +179,27 @@
     display: flex;
     align-items: center;
     gap: 14px;
+
+    .theme-toggle-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: #f1f5f9;
+        color: #4f46e5;
+        transform: scale(1.05);
+      }
+    }
 
     .user-profile-dropdown {
       display: flex;

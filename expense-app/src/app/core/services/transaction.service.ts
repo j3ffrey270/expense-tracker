@@ -57,6 +57,14 @@ export class TransactionService {
     return newCat;
   }
 
+  async deleteCategory(id: string): Promise<boolean> {
+    const currentList = this.categoriesSubject.value;
+    const updated = currentList.filter((c) => c.id !== id);
+    await this.storageService.set(this.CATEGORIES_KEY, updated);
+    this.categoriesSubject.next(updated);
+    return true;
+  }
+
 
   async getTransactions(): Promise<Transaction[]> {
     return this.transactionsSubject.value;
