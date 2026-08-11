@@ -29,10 +29,32 @@
         </button>
       </div>
 
-      <button type="button" class="action-primary-btn" (click)="openAddModal()">
-        <ion-icon name="add-outline"></ion-icon>
-        <span>Add Category</span>
-      </button>
+      <div class="toolbar-right-actions">
+        <div class="search-input-box">
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
+          <input
+            type="text"
+            class="custom-form-control search-input"
+            placeholder="Search categories..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+          />
+          <button
+            *ngIf="searchQuery"
+            type="button"
+            class="clear-search-btn"
+            (click)="searchQuery = ''; onSearchChange()"
+            title="Clear search"
+          >
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </button>
+        </div>
+
+        <button type="button" class="action-primary-btn" (click)="openAddModal()">
+          <ion-icon name="add-outline"></ion-icon>
+          <span>Add Category</span>
+        </button>
+      </div>
     </div>
 
     <div class="categories-grid-container">
@@ -59,7 +81,8 @@
 
     <div *ngIf="filteredCategories.length === 0" class="empty-state-box">
       <ion-icon name="pricetags-outline" class="empty-icon"></ion-icon>
-      <p>No categories found for this filter.</p>
+      <p *ngIf="!searchQuery">No categories found for this filter.</p>
+      <p *ngIf="searchQuery">No categories matching "{{ searchQuery }}".</p>
     </div>
 
   </div>

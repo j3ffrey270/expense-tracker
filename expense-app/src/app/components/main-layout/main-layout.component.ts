@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, NavigationEnd } from '@angular/router';
 import { IonContent, IonIcon } from '@ionic/angular/standalone';
@@ -12,7 +12,8 @@ import {
   chevronDownOutline,
   logOutOutline,
   sunnyOutline,
-  moonOutline
+  moonOutline,
+  downloadOutline
 } from 'ionicons/icons';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -39,6 +40,16 @@ export class MainLayoutComponent implements OnInit {
   pageSubtitle = 'Welcome back!';
   isDarkMode = false;
 
+  deferredPrompt: any = null;
+  canInstallPwa = false;
+
+  @HostListener('window:beforeinstallprompt', ['$event'])
+  onBeforeInstallPrompt(event: Event): void {
+    event.preventDefault();
+    this.deferredPrompt = event;
+    this.canInstallPwa = true;
+  }
+
   constructor(
     private authService: AuthService,
     private toastService: ToastService,
@@ -54,7 +65,8 @@ export class MainLayoutComponent implements OnInit {
       chevronDownOutline,
       logOutOutline,
       sunnyOutline,
-      moonOutline
+      moonOutline,
+      downloadOutline
     });
   }
 
@@ -82,6 +94,17 @@ export class MainLayoutComponent implements OnInit {
     const isDark = await this.themeService.toggleDarkMode();
     const modeName = isDark ? 'Dark Mode' : 'Light Mode';
     await this.toastService.show(`${modeName} activated`, 'info');
+  }
+
+  async installPwa(): Promise<void> {
+    if (!this.deferredPrompt) return;
+    this.deferredPrompt.prompt();
+    const choice = await this.deferredPrompt.userChoice;
+    if (choice && choice.outcome === 'accepted') {
+      await this.toastService.show('ExpenseTracker PWA installed!', 'success');
+    }
+    this.deferredPrompt = null;
+    this.canInstallPwa = false;
   }
 
   private updateActiveRouteFromUrl(url: string): void {

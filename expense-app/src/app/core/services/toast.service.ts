@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Toast } from '@capacitor/toast';
+import { Capacitor } from '@capacitor/core';
 import { ToastConfig, ToastType } from '../models/toast.model';
 
 @Injectable({
@@ -49,7 +50,9 @@ export class ToastService {
     const currentToasts = this.toastsSubject.value;
     this.toastsSubject.next([...currentToasts, config]);
 
-    this.triggerNativeToast(config.title, config.message);
+    if (Capacitor.isNativePlatform()) {
+      this.triggerNativeToast(config.title, config.message);
+    }
 
     if (config.duration && config.duration > 0) {
       setTimeout(() => {

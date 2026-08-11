@@ -25,8 +25,17 @@ export class AuthService {
   }
 
   async login(email: string, password: string): Promise<AuthResponse> {
-    const users = (await this.storageService.get<User[]>(this.USERS_KEY)) || [];
+    const emailRegex = /^[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.(com|org|net|in|co|io|edu|gov|ac|me|info|biz)$/i;
     const normalizedEmail = email.trim().toLowerCase();
+
+    if (!emailRegex.test(normalizedEmail)) {
+      return {
+        success: false,
+        message: 'Please enter a valid email address.'
+      };
+    }
+
+    const users = (await this.storageService.get<User[]>(this.USERS_KEY)) || [];
     const matchedUser = users.find(
       (u) => u.email.toLowerCase() === normalizedEmail && u.password === password
     );
@@ -50,8 +59,24 @@ export class AuthService {
   }
 
   async register(name: string, email: string, password: string): Promise<AuthResponse> {
-    const users = (await this.storageService.get<User[]>(this.USERS_KEY)) || [];
+    const emailRegex = /^[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.(com|org|net|in|co|io|edu|gov|ac|me|info|biz)$/i;
     const normalizedEmail = email.trim().toLowerCase();
+
+    if (!emailRegex.test(normalizedEmail)) {
+      return {
+        success: false,
+        message: 'Please enter a valid email address.'
+      };
+    }
+
+    if (password.length < 6) {
+      return {
+        success: false,
+        message: 'Password must be at least 6 characters long.'
+      };
+    }
+
+    const users = (await this.storageService.get<User[]>(this.USERS_KEY)) || [];
 
     const existingUser = users.find((u) => u.email.toLowerCase() === normalizedEmail);
     if (existingUser) {

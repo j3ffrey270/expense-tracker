@@ -10,6 +10,11 @@ ion-content.page-content {
   }
 }
 
+:host-context(body.dark-theme) ion-content.page-content {
+  --background: #0f172a !important;
+  --ion-background-color: #0f172a !important;
+}
+
 .auth-wrapper {
   width: 100%;
   max-width: 1000px;
@@ -118,6 +123,11 @@ ion-content.page-content {
   display: flex;
   flex-direction: column;
   gap: 18px;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .form-group {

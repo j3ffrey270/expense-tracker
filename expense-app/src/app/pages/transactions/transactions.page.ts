@@ -34,7 +34,8 @@ import {
   bagHandleOutline,
   filmOutline,
   chevronDownOutline,
-  addOutline
+  addOutline,
+  closeCircleOutline
 } from 'ionicons/icons';
 import { TransactionService } from '../../core/services/transaction.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -146,7 +147,8 @@ export class TransactionsPage implements OnInit {
       bagHandleOutline,
       filmOutline,
       chevronDownOutline,
-      addOutline
+      addOutline,
+      closeCircleOutline
     });
   }
 

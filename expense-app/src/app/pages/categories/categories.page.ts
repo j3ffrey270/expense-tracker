@@ -21,7 +21,9 @@ import {
   giftOutline,
   medicalOutline,
   fitnessOutline,
-  schoolOutline
+  schoolOutline,
+  searchOutline,
+  closeCircleOutline
 } from 'ionicons/icons';
 import { TransactionService } from '../../core/services/transaction.service';
 import { ToastService } from '../../core/services/toast.service';
@@ -43,6 +45,7 @@ export class CategoriesPage implements OnInit {
   categories: Category[] = [];
   filteredCategories: Category[] = [];
   selectedTypeTab: 'all' | 'income' | 'expense' = 'all';
+  searchQuery = '';
 
   showAddModal = false;
   newCatName = '';
@@ -87,7 +90,9 @@ export class CategoriesPage implements OnInit {
       giftOutline,
       medicalOutline,
       fitnessOutline,
-      schoolOutline
+      schoolOutline,
+      searchOutline,
+      closeCircleOutline
     });
   }
 
@@ -103,12 +108,20 @@ export class CategoriesPage implements OnInit {
     this.applyFilter();
   }
 
+  onSearchChange(): void {
+    this.applyFilter();
+  }
+
   applyFilter(): void {
-    if (this.selectedTypeTab === 'all') {
-      this.filteredCategories = this.categories;
-    } else {
-      this.filteredCategories = this.categories.filter((c) => c.type === this.selectedTypeTab);
+    let list = this.categories;
+    if (this.selectedTypeTab !== 'all') {
+      list = list.filter((c) => c.type === this.selectedTypeTab);
     }
+    if (this.searchQuery && this.searchQuery.trim() !== '') {
+      const query = this.searchQuery.toLowerCase().trim();
+      list = list.filter((c) => c.name.toLowerCase().includes(query));
+    }
+    this.filteredCategories = list;
   }
 
   openAddModal(): void {

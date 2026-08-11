@@ -23,7 +23,8 @@ import {
   filmOutline,
   chevronDownOutline,
   arrowDownCircleOutline,
-  arrowUpCircleOutline
+  arrowUpCircleOutline,
+  closeCircleOutline
 } from 'ionicons/icons';
 import { Chart, registerables } from 'chart.js';
 import { TransactionService } from '../../core/services/transaction.service';
@@ -103,7 +104,8 @@ export class DashboardPage implements OnInit, AfterViewInit {
       filmOutline,
       chevronDownOutline,
       arrowDownCircleOutline,
-      arrowUpCircleOutline
+      arrowUpCircleOutline,
+      closeCircleOutline
     });
   }
 

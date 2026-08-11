@@ -31,6 +31,26 @@
       </div>
 
       <div class="toolbar-right-actions">
+        <div class="search-input-box">
+          <ion-icon name="search-outline" class="search-icon"></ion-icon>
+          <input
+            type="text"
+            class="custom-form-control search-input"
+            placeholder="Search transactions..."
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+          />
+          <button
+            *ngIf="searchQuery"
+            type="button"
+            class="clear-search-btn"
+            (click)="searchQuery = ''; onSearchChange()"
+            title="Clear search"
+          >
+            <ion-icon name="close-circle-outline"></ion-icon>
+          </button>
+        </div>
+
         <div class="filter-dropdown-wrapper">
           <button
             type="button"
@@ -204,7 +224,7 @@
                 [class.income-val]="tx.type === 'income'"
                 [class.expense-val]="tx.type === 'expense'"
               >
-                {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'INR':'symbol':'1.2-2' }}
+                {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'USD':'symbol':'1.2-2' }}
               </span>
             </td>
 

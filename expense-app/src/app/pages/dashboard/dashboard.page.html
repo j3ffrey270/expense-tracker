@@ -9,6 +9,15 @@
         [(ngModel)]="searchQuery"
         (ngModelChange)="onSearchChange()"
       />
+      <button
+        *ngIf="searchQuery"
+        type="button"
+        class="clear-search-btn"
+        (click)="searchQuery = ''; onSearchChange()"
+        title="Clear search"
+      >
+        <ion-icon name="close-circle-outline"></ion-icon>
+      </button>
     </div>
 
     <div class="type-filter-pills">
@@ -46,7 +55,7 @@
       </div>
       <div class="stat-card-details">
         <span class="stat-label-title">Total Balance</span>
-        <h2 class="stat-amount-value">{{ totalBalance | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <h2 class="stat-amount-value">{{ totalBalance | currency:'USD':'symbol':'1.2-2' }}</h2>
         <span class="stat-trend-badge positive">
           <ion-icon name="trending-up-outline"></ion-icon> +12.3% from last month
         </span>
@@ -59,7 +68,7 @@
       </div>
       <div class="stat-card-details">
         <span class="stat-label-title">Total Income</span>
-        <h2 class="stat-amount-value">{{ totalIncome | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <h2 class="stat-amount-value">{{ totalIncome | currency:'USD':'symbol':'1.2-2' }}</h2>
         <span class="stat-trend-badge positive">
           <ion-icon name="trending-up-outline"></ion-icon> +8.1% from last month
         </span>
@@ -72,7 +81,7 @@
       </div>
       <div class="stat-card-details">
         <span class="stat-label-title">Total Expense</span>
-        <h2 class="stat-amount-value">{{ totalExpense | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <h2 class="stat-amount-value">{{ totalExpense | currency:'USD':'symbol':'1.2-2' }}</h2>
         <span class="stat-trend-badge negative">
           <ion-icon name="trending-down-outline"></ion-icon> -4.3% from last month
         </span>
@@ -85,7 +94,7 @@
       </div>
       <div class="stat-card-details">
         <span class="stat-label-title">This Month</span>
-        <h2 class="stat-amount-value">{{ thisMonthTotal | currency:'INR':'symbol':'1.2-2' }}</h2>
+        <h2 class="stat-amount-value">{{ thisMonthTotal | currency:'USD':'symbol':'1.2-2' }}</h2>
         <span class="stat-trend-badge positive">
           <ion-icon name="trending-up-outline"></ion-icon> +3.8% from last month
         </span>
@@ -123,7 +132,7 @@
               <span class="legend-category-name">{{ item.category.name }}</span>
             </div>
             <div class="legend-amount-percentage">
-              <span class="legend-amount">{{ item.amount | currency:'INR':'symbol':'1.0-0' }}</span>
+              <span class="legend-amount">{{ item.amount | currency:'USD':'symbol':'1.0-0' }}</span>
               <span class="legend-pct">({{ item.percentage }}%)</span>
             </div>
           </div>
@@ -162,7 +171,7 @@
               [class.income-tx]="tx.type === 'income'"
               [class.expense-tx]="tx.type === 'expense'"
             >
-              {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'INR':'symbol':'1.2-2' }}
+              {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'USD':'symbol':'1.2-2' }}
             </span>
           </div>
         </div>

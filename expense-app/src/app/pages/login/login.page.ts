@@ -83,6 +83,17 @@ export class LoginPage implements OnInit {
       return;
     }
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]{2,}@[a-zA-Z0-9.-]+\.(com|org|net|in|co|io|edu|gov|ac|me|info|biz)$/i;
+    if (!emailRegex.test(this.email.trim())) {
+      await this.toastService.show('Please enter a valid email address (e.g. name@gmail.com).', 'warning');
+      return;
+    }
+
+    if (this.password.length < 6) {
+      await this.toastService.show('Password must be at least 6 characters long.', 'warning');
+      return;
+    }
+
     if (this.isRegisterMode) {
       if (!this.name) {
         await this.toastService.show('Please enter your full name.', 'warning');

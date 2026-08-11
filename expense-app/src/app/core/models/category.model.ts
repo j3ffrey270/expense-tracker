@@ -6,6 +6,7 @@ export interface Category {
   type: TransactionType;
   icon: string;
   color: string;
+  userId?: string;
 }
 
 export const DEFAULT_CATEGORIES: Category[] = [

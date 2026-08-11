@@ -3,6 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { Transaction, TransactionFilter, MonthlySummary } from '../models/transaction.model';
 import { DEFAULT_CATEGORIES, Category } from '../models/category.model';
 import { StorageService } from './storage.service';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,27 +18,35 @@ export class TransactionService {
   private categoriesSubject = new BehaviorSubject<Category[]>(DEFAULT_CATEGORIES);
   public categories$: Observable<Category[]> = this.categoriesSubject.asObservable();
 
-  constructor(private storageService: StorageService) {
-    this.initTransactions();
-    this.initCategories();
+  constructor(
+    private storageService: StorageService,
+    private authService: AuthService
+  ) {
+    this.authService.currentUser$.subscribe((user) => {
+      this.loadUserData(user ? user.id : undefined);
+    });
   }
 
-  private async initTransactions(): Promise<void> {
-    let list = await this.storageService.get<Transaction[]>(this.TRANSACTIONS_KEY);
-    if (!list || list.length === 0) {
-      list = this.generateInitialSeedData();
-      await this.storageService.set(this.TRANSACTIONS_KEY, list);
+  private async loadUserData(userId?: string): Promise<void> {
+    if (!userId) {
+      this.transactionsSubject.next([]);
+      this.categoriesSubject.next(DEFAULT_CATEGORIES);
+      return;
     }
-    this.transactionsSubject.next(list);
+
+    let allTx = (await this.storageService.get<Transaction[]>(this.TRANSACTIONS_KEY)) || [];
+    let userTx = allTx.filter((t) => t.userId === userId);
+
+    this.transactionsSubject.next(userTx);
+
+    let allCats = (await this.storageService.get<Category[]>(this.CATEGORIES_KEY)) || DEFAULT_CATEGORIES;
+    let userCats = allCats.filter((c) => !c.userId || c.userId === userId);
+    this.categoriesSubject.next(userCats);
   }
 
-  private async initCategories(): Promise<void> {
-    let list = await this.storageService.get<Category[]>(this.CATEGORIES_KEY);
-    if (!list || list.length === 0) {
-      list = DEFAULT_CATEGORIES;
-      await this.storageService.set(this.CATEGORIES_KEY, list);
-    }
-    this.categoriesSubject.next(list);
+  private getActiveUserId(): string {
+    const user = this.authService.getCurrentUser();
+    return user ? user.id : 'user_guest';
   }
 
   getCategories(): Category[] {
@@ -45,26 +54,32 @@ export class TransactionService {
   }
 
   async addCustomCategory(category: Omit<Category, 'id'>): Promise<Category> {
+    const userId = this.getActiveUserId();
     const newCat: Category = {
       ...category,
-      id: `cat_custom_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`
+      id: `cat_custom_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      userId: userId
     };
 
-    const currentList = this.categoriesSubject.value;
-    const updated = [...currentList, newCat];
-    await this.storageService.set(this.CATEGORIES_KEY, updated);
-    this.categoriesSubject.next(updated);
+    let allCats = (await this.storageService.get<Category[]>(this.CATEGORIES_KEY)) || DEFAULT_CATEGORIES;
+    allCats = [...allCats, newCat];
+    await this.storageService.set(this.CATEGORIES_KEY, allCats);
+
+    const userCats = allCats.filter((c) => !c.userId || c.userId === userId);
+    this.categoriesSubject.next(userCats);
     return newCat;
   }
 
   async deleteCategory(id: string): Promise<boolean> {
-    const currentList = this.categoriesSubject.value;
-    const updated = currentList.filter((c) => c.id !== id);
-    await this.storageService.set(this.CATEGORIES_KEY, updated);
-    this.categoriesSubject.next(updated);
+    const userId = this.getActiveUserId();
+    let allCats = (await this.storageService.get<Category[]>(this.CATEGORIES_KEY)) || DEFAULT_CATEGORIES;
+    allCats = allCats.filter((c) => c.id !== id);
+    await this.storageService.set(this.CATEGORIES_KEY, allCats);
+
+    const userCats = allCats.filter((c) => !c.userId || c.userId === userId);
+    this.categoriesSubject.next(userCats);
     return true;
   }
-
 
   async getTransactions(): Promise<Transaction[]> {
     return this.transactionsSubject.value;
@@ -75,39 +90,46 @@ export class TransactionService {
   }
 
   async addTransaction(transaction: Omit<Transaction, 'id' | 'createdAt'>): Promise<Transaction> {
+    const userId = this.getActiveUserId();
     const newTx: Transaction = {
       ...transaction,
       id: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      userId: userId,
       createdAt: new Date().toISOString()
     };
 
-    const currentList = this.transactionsSubject.value;
-    const updated = [newTx, ...currentList];
-    await this.storageService.set(this.TRANSACTIONS_KEY, updated);
-    this.transactionsSubject.next(updated);
+    let allTx = (await this.storageService.get<Transaction[]>(this.TRANSACTIONS_KEY)) || [];
+    allTx = [newTx, ...allTx];
+    await this.storageService.set(this.TRANSACTIONS_KEY, allTx);
+
+    const userTx = allTx.filter((t) => t.userId === userId);
+    this.transactionsSubject.next(userTx);
     return newTx;
   }
 
   async updateTransaction(id: string, updatedData: Partial<Transaction>): Promise<boolean> {
-    const currentList = this.transactionsSubject.value;
-    const index = currentList.findIndex((t) => t.id === id);
+    const userId = this.getActiveUserId();
+    let allTx = (await this.storageService.get<Transaction[]>(this.TRANSACTIONS_KEY)) || [];
+    const index = allTx.findIndex((t) => t.id === id);
     if (index === -1) return false;
 
-    const updatedTx = { ...currentList[index], ...updatedData };
-    const updatedList = [...currentList];
-    updatedList[index] = updatedTx;
+    allTx[index] = { ...allTx[index], ...updatedData };
+    await this.storageService.set(this.TRANSACTIONS_KEY, allTx);
 
-    await this.storageService.set(this.TRANSACTIONS_KEY, updatedList);
-    this.transactionsSubject.next(updatedList);
+    const userTx = allTx.filter((t) => t.userId === userId);
+    this.transactionsSubject.next(userTx);
     return true;
   }
 
   async deleteTransaction(id: string): Promise<boolean> {
-    const currentList = this.transactionsSubject.value;
-    const updatedList = currentList.filter((t) => t.id !== id);
+    const userId = this.getActiveUserId();
+    let allTx = (await this.storageService.get<Transaction[]>(this.TRANSACTIONS_KEY)) || [];
+    allTx = allTx.filter((t) => t.id !== id);
 
-    await this.storageService.set(this.TRANSACTIONS_KEY, updatedList);
-    this.transactionsSubject.next(updatedList);
+    await this.storageService.set(this.TRANSACTIONS_KEY, allTx);
+
+    const userTx = allTx.filter((t) => t.userId === userId);
+    this.transactionsSubject.next(userTx);
     return true;
   }
 
@@ -149,7 +171,6 @@ export class TransactionService {
       return true;
     });
   }
-
 
   getTotalBalance(transactions: Transaction[]): number {
     const income = this.getTotalIncome(transactions);
@@ -213,12 +234,12 @@ export class TransactionService {
     }));
   }
 
-  private generateInitialSeedData(): Transaction[] {
+  private generateInitialSeedData(userId: string): Transaction[] {
     const today = new Date().toISOString().split('T')[0];
     return [
       {
-        id: 'tx_seed_1',
-        userId: 'user_demo_1',
+        id: `tx_seed_1_${Date.now()}`,
+        userId: userId,
         title: 'Salary Deposit',
         amount: 4500.0,
         type: 'income',
@@ -232,8 +253,8 @@ export class TransactionService {
         createdAt: new Date().toISOString()
       },
       {
-        id: 'tx_seed_2',
-        userId: 'user_demo_1',
+        id: `tx_seed_2_${Date.now()}`,
+        userId: userId,
         title: 'Grocery Shopping',
         amount: 85.5,
         type: 'expense',
@@ -247,8 +268,8 @@ export class TransactionService {
         createdAt: new Date().toISOString()
       },
       {
-        id: 'tx_seed_3',
-        userId: 'user_demo_1',
+        id: `tx_seed_3_${Date.now()}`,
+        userId: userId,
         title: 'Electricity Bill',
         amount: 120.0,
         type: 'expense',
@@ -260,38 +281,7 @@ export class TransactionService {
         date: today,
         notes: 'Monthly electric utility',
         createdAt: new Date().toISOString()
-      },
-      {
-        id: 'tx_seed_4',
-        userId: 'user_demo_1',
-        title: 'Netflix Subscription',
-        amount: 15.99,
-        type: 'expense',
-        categoryId: 'cat_entertainment',
-        categoryName: 'Entertainment',
-        categoryIcon: 'film-outline',
-        categoryColor: '#5260ff',
-        paymentMethod: 'Credit Card',
-        date: today,
-        notes: 'Premium streaming plan',
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: 'tx_seed_5',
-        userId: 'user_demo_1',
-        title: 'Freelance Work',
-        amount: 800.0,
-        type: 'income',
-        categoryId: 'cat_freelance',
-        categoryName: 'Freelance',
-        categoryIcon: 'laptop-outline',
-        categoryColor: '#3dc2ff',
-        paymentMethod: 'PayPal',
-        date: today,
-        notes: 'UI Design project payment',
-        createdAt: new Date().toISOString()
       }
-
     ];
   }
 }

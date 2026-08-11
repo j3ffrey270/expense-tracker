@@ -77,12 +77,22 @@
             <ion-icon [name]="isDarkMode ? 'sunny-outline' : 'moon-outline'"></ion-icon>
           </button>
 
+          <button
+            *ngIf="canInstallPwa"
+            type="button"
+            class="install-pwa-btn"
+            (click)="installPwa()"
+            title="Install ExpenseTracker App"
+          >
+            <ion-icon name="download-outline"></ion-icon>
+            <span>Install App</span>
+          </button>
+
           <div class="user-profile-dropdown">
             <div class="profile-avatar-circle">
               <span>{{ (currentUser?.name || 'J')[0] }}</span>
             </div>
             <span class="user-display-name">{{ currentUser?.name || 'John Doe' }}</span>
-            <ion-icon name="chevron-down-outline" class="dropdown-chevron"></ion-icon>
           </div>
         </div>
       </header>

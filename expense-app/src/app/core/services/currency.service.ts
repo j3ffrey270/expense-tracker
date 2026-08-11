@@ -14,7 +14,7 @@ export interface CurrencyRatesResponse {
 export class CurrencyService {
   private readonly API_URL = 'https://open.er-api.com/v6/latest/USD';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getExchangeRates(): Observable<CurrencyRatesResponse> {
     return this.http.get<CurrencyRatesResponse>(this.API_URL).pipe(
